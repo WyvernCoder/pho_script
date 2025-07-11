@@ -156,6 +156,13 @@ supported_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.heic', '.mp4'
 photo_folder = os.path.join(self_path(), "Completed")
 print('处理目录：%s' % photo_folder)
 
+# 找不到 Completed 输出目录时则询问是否用当前目录代替。
+if not os.path.exists(photo_folder):
+    answer = input('未找到 Completed 输出目录，是否使用当前目录继续？(y/n): ').lower()
+    if answer == 'y':
+        photo_folder = self_path()
+        print('更正处理目录：%s' % photo_folder)
+
 # 解除Pillow默认最大像素限制
 Image.MAX_IMAGE_PIXELS = None
 
