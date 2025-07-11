@@ -82,12 +82,23 @@ def process_photos(folder_path, target_folder):
             print('[%s%%] Moved %s' % (int(file_count/total_files * 100), dest_path))
 
 
+# 获取自身文件路径
+def self_path():
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的 exe 文件
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        # 如果是普通的 .py 文件
+        return os.path.abspath(os.path.dirname(__file__))
+
+
 # 定义支持的文件
 supported_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.heic', '.mp4', '.dng']
 
 # 定义照片文件夹和目标文件夹
-photo_folder = os.path.dirname(os.path.abspath(__file__))  # 该py脚本所在路径
+photo_folder = self_path()  # 该py脚本所在路径
 target_folder = "%s\\Completed" % photo_folder  # 该py脚本所在路径下的Completed文件夹
+print('处理目录：%s' % target_folder)
 
 # 解除Pillow默认最大像素限制
 Image.MAX_IMAGE_PIXELS = None
@@ -96,3 +107,5 @@ Image.MAX_IMAGE_PIXELS = None
 process_photos(photo_folder, target_folder)
 
 print("分类完成！")
+
+input("按下 Enter 键退出程序...")
