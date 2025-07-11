@@ -2,5 +2,29 @@
 此脚本用于将旧照片转换成pho读取的格式
 
 共分为两步：
-1. 运行build.py，把旧照片按照拍摄日期转换成"年/月/日"格式的路径，注意需要修改photo_folder和target_folder为你的路径
-2. 运行thumbnail.py，按照".thumbnail/年/月/日"格式生成缩略图，photo_folder为第1步中target_folder的路径
+1. 将2个脚本放入带有照片的文件夹中。
+2. 运行 build.py，该脚本会把照片按下列文件结构进行分类，无论照片是否位于子文件夹中都会被处理。
+3. 运行 thumbnail.py，该脚本会为上一步分类好的照片生成缩略图，所有缩略图均会位于 .thumbnail 文件夹中。
+  
+```
+Completed # 默认情况下，build.py 脚本会自动在当前目录创建 Completed 文件夹并将照片剪切进该文件夹中。
+│
+├─2018
+│  └─11
+│      ├─18
+│      │      IMG_20181118_225848_HDR.jpg
+│      │
+│      └─17
+│             IMG_20181117_235245_HDR.jpg
+│             IMG_20181117_171711_HDR.jpg
+│
+└─.thumbnail # 缩略图文件夹，由 thumbnail.py 脚本创建。
+    └─2018
+        └─11
+            ├─18
+            │      IMG_20181118_225848_HDR.jpg
+            │
+            └─17
+                   IMG_20181117_235245_HDR.jpg
+                   IMG_20181117_171711_HDR.jpg
+```
