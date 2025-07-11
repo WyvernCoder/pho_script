@@ -3,6 +3,7 @@
 """
 import os
 import pathlib
+import sys
 
 import rawpy
 from PIL import Image, ImageOps
@@ -139,11 +140,21 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                     print(f"Error processing {file}: {e}")
 
 
+# 获取自身文件路径
+def self_path():
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的 exe 文件
+        return os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        # 如果是普通的 .py 文件
+        return os.path.abspath(os.path.dirname(__file__))
+
 # 定义支持的文件
 supported_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.heic', '.mp4', '.dng']
 
 # 定义照片文件夹和缩略图尺寸
-photo_folder = os.path.join(os.path.abspath(os.path.dirname(__file__)), "Completed")
+photo_folder = os.path.join(self_path(), "Completed")
+print('处理目录：%s' % photo_folder)
 
 # 解除Pillow默认最大像素限制
 Image.MAX_IMAGE_PIXELS = None
@@ -152,3 +163,5 @@ Image.MAX_IMAGE_PIXELS = None
 generate_thumbnail(photo_folder)
 
 print("缩略图生成完成！")
+
+input("按下 Enter 键退出程序...")
