@@ -34,3 +34,7 @@ Completed # 默认情况下，build.py 脚本会自动在当前目录创建 Comp
                    IMG_20181117_235245_HDR.jpg
                    IMG_20181117_171711_HDR.jpg
 ```
+
+# 截图  
+<img width="991.5" height="548.5" alt="image" src="https://github.com/user-attachments/assets/0fbd2708-d374-4000-911f-a125344cdf57" />  
+<img width="994" height="550" alt="image" src="https://github.com/user-attachments/assets/c6394a01-f955-4a85-81e5-e428daf582c6" />
