@@ -9,8 +9,8 @@
 
 # 使用步骤  
 1. 将2个脚本放入带有照片的文件夹中。
-2. 运行 build.py，该脚本会把照片按下列文件结构进行分类，无论照片是否位于子文件夹中都会被处理。
-3. 运行 thumbnail.py，该脚本会为上一步分类好的照片生成缩略图，所有缩略图均会位于 .thumbnail 文件夹中。
+2. 运行 build.py (或 PhoStructBuilder.exe)，该脚本会把照片按下列文件结构进行分类，无论照片是否位于子文件夹中都会被处理。
+3. 运行 thumbnail.py (或 PhoThumbGenerator.exe)，该脚本会为上一步分类好的照片生成缩略图，所有缩略图均会位于 .thumbnail 文件夹中。
   
 ```
 Completed # 默认情况下，build.py 脚本会自动在当前目录创建 Completed 文件夹并将照片剪切进该文件夹中。
