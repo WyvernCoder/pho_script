@@ -77,13 +77,20 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                 os.makedirs(thumbnail_folder)
             # 缩略图照片的路径
             thumbnail_path = os.path.join(thumbnail_folder, file)
-            # 将缩略图路径的后缀设置为jpg
-            path = pathlib.Path(thumbnail_path)
-            thumbnail_path = path.with_suffix(".jpg")
-            # 缩略图存在则跳过不处理
-            if os.path.exists(thumbnail_path):
-                print('[%s%%] Exists %s' % (int(file_count / total_files * 100), thumbnail_path))
-                continue
+
+            # 将缩略图路径的后缀设置为 jpg 用于 Pillow 生成缩略图。
+            # 否则在生成 mp4 等格式缩略图时， Pillow 会抛出异常。 
+            thumbnail_path_jpg = pathlib.Path(thumbnail_path).with_suffix(".jpg")
+
+            # 缩略图存在则跳过不处理 
+            if use_jpg_extension:
+                if os.path.exists(thumbnail_path_jpg):
+                    print('[%s%%] Exists %s' % (int(file_count / total_files * 100), thumbnail_path_jpg))
+                    continue
+            else:
+                if os.path.exists(thumbnail_path):
+                    print('[%s%%] Exists %s' % (int(file_count / total_files * 100), thumbnail_path))
+                    continue
 
             # 处理常见图片文件
             if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
@@ -93,8 +100,12 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                         img = ImageOps.exif_transpose(img)
                         img.thumbnail(thumbnail_size)
                         img = img.convert("RGB")
-                        img.save(thumbnail_path)
-                        print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        img.save(thumbnail_path_jpg)
+                        if not use_jpg_extension:
+                            os.rename(thumbnail_path_jpg, thumbnail_path)   # 将 jpg 格式的缩略图改回原名，以适配 Pho 的命名格式。
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        else:
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path_jpg))
                 except OSError as e:
                     print(f"Error processing {file}: {e}")
 
@@ -106,8 +117,12 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                         img = ImageOps.exif_transpose(img)
                         img.thumbnail(thumbnail_size)
                         img = img.convert("RGB")
-                        img.save(thumbnail_path)
-                        print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        img.save(thumbnail_path_jpg)
+                        if not use_jpg_extension:
+                            os.rename(thumbnail_path_jpg, thumbnail_path)   # 将 jpg 格式的缩略图改回原名，以适配 Pho 的命名格式。
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        else:
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path_jpg))
                 except OSError as e:
                     print(f"Error processing {file}: {e}")
 
@@ -120,8 +135,12 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                         img = Image.fromarray(frame)
                         img.thumbnail(thumbnail_size)
                         img = img.convert("RGB")
-                        img.save(thumbnail_path)
-                        print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        img.save(thumbnail_path_jpg)
+                        if not use_jpg_extension:
+                            os.rename(thumbnail_path_jpg, thumbnail_path)   # 将 jpg 格式的缩略图改回原名，以适配 Pho 的命名格式。
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        else:
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path_jpg))
                 except OSError as e:
                     print(f"Error processing {file}: {e}")
 
@@ -134,8 +153,12 @@ def generate_thumbnail(photo_folder, thumbnail_size=(200, 200)):
                         img = Image.fromarray(standard_rgb)
                         img.thumbnail(thumbnail_size)
                         img = img.convert("RGB")
-                        img.save(thumbnail_path)
-                        print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        img.save(thumbnail_path_jpg)
+                        if not use_jpg_extension:
+                            os.rename(thumbnail_path_jpg, thumbnail_path)   # 将 jpg 格式的缩略图改回原名，以适配 Pho 的命名格式。
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path))
+                        else:
+                            print('[%s%%] Created %s' % (int(file_count / total_files * 100), thumbnail_path_jpg))
                 except OSError as e:
                     print(f"Error processing {file}: {e}")
 
@@ -148,6 +171,11 @@ def self_path():
     else:
         # 如果是普通的 .py 文件
         return os.path.abspath(os.path.dirname(__file__))
+
+
+# Pho 缩略图后缀设置
+print('注：Pho 要求缩略图的名称和扩展名与原图完全一样，因此以下可能会输出视频或其他非 jpg 格式的缩略图。这些缩略图实为 jpg 改后缀而成。')
+use_jpg_extension = False
 
 # 定义支持的文件
 supported_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.heic', '.mp4', '.dng']
