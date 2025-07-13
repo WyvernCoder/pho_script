@@ -92,7 +92,11 @@ def process_photos(folder_path, target_folder):
                     properties = None
                     properties = propsys.SHGetPropertyStoreFromParsingName(item_path)
                     dt = properties.GetValue(pscon.PKEY_Media_DateEncoded).GetValue()
-                    date_time = datetime.fromtimestamp(dt.timestamp())
+
+                    datatime_str = datetime.fromtimestamp(dt.timestamp()).strftime('%Y:%m:%d %H:%M:%S')
+                    time24 = datetime.strptime(datatime_str, '%Y:%m:%d %H:%M:%S')
+                    time12 = datetime.strftime(time24, '%Y:%m:%d %I:%M:%S')
+                    date_time = datetime.strptime(time12, '%Y:%m:%d %H:%M:%S')
                 except (AttributeError, KeyError, IndexError, OSError, TypeError, win32com.universal.com_error) as e:
                     pass
                 finally:
