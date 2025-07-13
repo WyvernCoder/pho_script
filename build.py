@@ -3,6 +3,8 @@
 """
 import os
 import pathlib
+
+import win32com.universal
 from PIL import Image
 import shutil
 from datetime import datetime
@@ -35,6 +37,8 @@ def count_files_by_types(root_dir):
 
 
 def process_photos(folder_path, target_folder):
+    print(f"正在计算路径：{folder_path}")
+
     # 获取文件夹中所有文件和子文件夹
     items = os.listdir(folder_path)
 
@@ -60,33 +64,40 @@ def process_photos(folder_path, target_folder):
             else:
                 continue
 
+            print('[%s/%s] Moving %s' % (file_count, total_files, item_path))
+
             # 使用Pillow库打开图片并获取拍摄日期
             date_time: datetime = datetime.fromtimestamp(os.path.getmtime(item_path))
 
             # 图片类型 
             # 读取 EXIF 中的“Date Taken”参数，参考
             # https://stackoverflow.com/questions/23064549/get-date-and-time-when-photo-was-taken-from-exif-data-using-pil
-            try:
-                with Image.open(item_path) as img:
-                    exif_data = img._getexif()
-                    # Pho 读取的是 12 小时制的 Date Taken，而不是24小时制！
-                    # date_time = datetime.strptime(exif_data[36867], '%Y:%m:%d %H:%M:%S')
-                    time24 = datetime.strptime(exif_data[36867], '%Y:%m:%d %H:%M:%S')
-                    time12 = datetime.strftime(time24, '%Y:%m:%d %I:%M:%S')
-                    date_time = datetime.strptime(time12, '%Y:%m:%d %H:%M:%S')
-            except (AttributeError, KeyError, IndexError, OSError, TypeError) as e:
-                pass
+            if pathlib.Path(item_path).suffix != '.mp4':
+                try:
+                    with Image.open(item_path) as img:
+                        exif_data = img._getexif()
+                        # Pho 读取的是 12 小时制的 Date Taken，而不是24小时制！
+                        # date_time = datetime.strptime(exif_data[36867], '%Y:%m:%d %H:%M:%S')
+                        time24 = datetime.strptime(exif_data[36867], '%Y:%m:%d %H:%M:%S')
+                        time12 = datetime.strftime(time24, '%Y:%m:%d %I:%M:%S')
+                        date_time = datetime.strptime(time12, '%Y:%m:%d %H:%M:%S')
+                except (AttributeError, KeyError, IndexError, OSError, TypeError) as e:
+                    pass
 
             # 视频类型 读取 Media created 属性，Pho 读取的就是这个属性 参考 
             # https://stackoverflow.com/questions/79613425/get-media-created-timestamp-with-python-for-mp4-and-m4a-video-audio-files
-            try:
-                properties = propsys.SHGetPropertyStoreFromParsingName(item_path)
-                dt = properties.GetValue(pscon.PKEY_Media_DateEncoded).GetValue()
-                date_time = datetime.fromtimestamp(dt.timestamp())
-            except (AttributeError, KeyError, IndexError, OSError, TypeError) as e:
-                pass
-            finally:
-                del dt, properties  # 不释放无法 Move，文件被占用
+            if pathlib.Path(item_path).suffix == ".mp4":
+                try:
+                    dt = None
+                    properties = None
+                    properties = propsys.SHGetPropertyStoreFromParsingName(item_path)
+                    dt = properties.GetValue(pscon.PKEY_Media_DateEncoded).GetValue()
+                    date_time = datetime.fromtimestamp(dt.timestamp())
+                except (AttributeError, KeyError, IndexError, OSError, TypeError, win32com.universal.com_error) as e:
+                    pass
+                finally:
+                    # 不释放无法 Move，文件被占用
+                    del dt, properties
 
             # 创建目标文件夹，如果不存在
             target_date_folder = os.path.join(target_folder, str(date_time.year), str(date_time.month).zfill(2),
